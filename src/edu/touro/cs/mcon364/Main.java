@@ -4,9 +4,15 @@ import java.util.*;
 
 public class Main implements Set<String> {
     int initialCapacity = 16;
-    float loadFactor = 75;
+    float loadFactor = .75;
 
     public Main(int initialCapacity, float loadFactor ) {
+        if (initialCapacity < 0){
+            throw new IllegalArgumentException("capacity too small");
+        }
+        if (loadFactor < 0 || loadFactor > 75){
+            throw new IllegalArgumentException("load factor not good");
+        }
         this.initialCapacity = initialCapacity;
         this.loadFactor = loadFactor;
     }
@@ -29,9 +35,6 @@ public class Main implements Set<String> {
 
     @Override
     public boolean contains(Object o) {
-           if (o == null){
-               throw new NullPointerException();
-           }
            if (o.getClass() != String.class){
                return false;
            }
@@ -75,11 +78,17 @@ public class Main implements Set<String> {
         if (size/((double)initialCapacity) >= loadFactor){
             resize(2 * initialCapacity +1);
         }
-        int element = s.hashCode()%initialCapacity;
-        if (list1[element]==null){
-            list1[element]= new ArrayList<String>();
+        int element;
+        if (s == null){
+            element = 0;
         }
-        if(list1[element].contains(s)){
+        else {
+            element = s.hashCode() % initialCapacity;
+        }
+        if (list1[element] == null) {
+            list1[element] = new ArrayList<String>();
+        }
+        if (list1[element].contains(s)) {
             return false;
         }
         list1[element].add(s);
@@ -101,32 +110,16 @@ public class Main implements Set<String> {
         list1 = capacity;
     }
 
- //   @Override
-//    //public boolean remove(Object o) {
-//        if (o==null) {
-//         throw new NullPointerException();
-//        } else {
-//                if (list1[o.hashCode()%initialCapacity]==null) {
-//                    return false;
-//                }
-//                 if (list1[o.hashCode()%initialCapacity].remove(o)){
-//                     size--;
-//                     return true;
-//            }
-//                 return false;
-//        }
-//    }
     public boolean remove(Object o) {
-        if (o==null) {
-            throw new NullPointerException();
+        if (o == null) {
+            return false;
         }
-        if (list1[o.hashCode()%initialCapacity]==null) {
-                return false;
-            }
-        list1[o.hashCode()%initialCapacity].remove(o);{
-                size--;
-                return true;
-            }
+        if (list1[o.hashCode() % initialCapacity] == null) {
+            return false;
+        }
+        boolean x = list1[o.hashCode() % initialCapacity].remove(o);
+            size--;
+            return x;
         }
 
 
@@ -164,32 +157,35 @@ public class Main implements Set<String> {
 
         @Override
         public String next() {
-            if (!hasNext()){
+            if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            while (list1[MainArray]==null){
-                currList = 0;
+            while (list1[MainArray] == null) { //index where we at rn
                 MainArray++;
             }
 
-            List bucket = list1[MainArray];
-            if (currList >= bucket.size()){
+            List bucket = list1[MainArray]; //where we are in main array and we know it is not null
+            if (currList >= bucket.size()) { //if we are at end of one array lists move to next
                 MainArray++;
                 currList = 0;
-                while (list1[MainArray]==null){
+                while (list1[MainArray] == null) {
                     MainArray++;
                 }
-            }
+                 bucket = list1[MainArray]; //moves this to where we are after we moved it
+            } // all this to make sure we in right place
 
-            String currentPlace = (String) bucket.get(currList);
-            currentIndex++;
+            T currentPlace = (T) bucket.get(currList);
+            elementsReturned++;
+            currList++;
             return currentPlace;
-        }
     }
 
     @Override
     public void clear() {
-        size = 0;
+       size = 0;
+       for (int i =0; i < list1.length; i++){
+            list1[i] = null;
+        }
     }
 
     @Override
