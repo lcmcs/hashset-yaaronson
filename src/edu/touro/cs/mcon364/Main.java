@@ -111,16 +111,19 @@ public class Main implements Set<String> {
     }
 
     public boolean remove(Object o) {
-        if (o == null) {
-            return false;
+        List element;
+        if (o == null){
+            element = list1[0];
         }
-        if (list1[o.hashCode() % initialCapacity] == null) {
-            return false;
+        else {
+        element =   list1[o.hashCode() % initialCapacity];
         }
-        boolean x = list1[o.hashCode() % initialCapacity].remove(o);
+        boolean x =  element.remove(o);
+        if (x == true){
             size--;
-            return x;
         }
+        return x;
+    }
 
 
     @Override
